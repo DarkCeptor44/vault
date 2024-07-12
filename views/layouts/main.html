@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    {{if .Title}}
+    <title>{{.Title}} - Vault</title>
+    {{else}}
+    <title>Vault</title>
+    {{end}}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="/static/alertify.core.min.css" />
+    <link rel="stylesheet" href="/static/alertify.default.min.css" />
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+    <script type="text/javascript" src="/static/argon2-bundled.min.js"></script>
+    <script type="text/javascript" src="/static/alertify.min.js"></script>
+    <script type="text/javascript" src="/static/script.js"></script>
+
+    {{embed}}
+</body>
+
+</html>

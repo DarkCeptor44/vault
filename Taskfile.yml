@@ -1,0 +1,34 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  Ext: '{{if eq .OS "Windows_NT"}}.exe{{end}}'
+  Name: "vault{{.Ext}}"
+
+tasks:
+  default:
+    desc: Build and run
+    cmds:
+      - task: build
+      - ./bin/{{.OS}}/{{.Name}}
+
+  build:
+    desc: Build
+    cmds:
+      - go build -o ./bin/{{.OS}}/{{.Name}} .
+
+  vuln:
+    desc: Run Go vulnerability check
+    cmds:
+      - govulncheck ./...
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test ./...
+
+  benchmark:
+    desc: Run benchmarks
+    cmds:
+      - go test ./... -bench .

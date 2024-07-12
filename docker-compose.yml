@@ -1,0 +1,15 @@
+services:
+  vault:
+    image: vault:latest
+    container_name: vault
+    ports:
+      - 8080:8080
+    environment:
+      - HOST=0.0.0.0  # optional
+      - PORT=8080  # optional unless using a different port
+      - DOCKER=yes  # optional
+      - DEBUG=yes  # if debug needed
+    volumes:
+      - ./data:/documents # where data will be stored
+      - /etc/localtime:/etc/localtime:ro # for correct timezone when logging
+    restart: unless-stopped

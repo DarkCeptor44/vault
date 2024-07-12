@@ -1,0 +1,246 @@
+<div id="modal" class="modal">
+    <div class="card" style="min-width:22em;">
+        <div class="card-header">
+            Vault
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="filename">Filename</label>
+                <input type="text" class="control" placeholder="File" id="filename" autocomplete="off" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="password">Password</label>
+                <input type="password" class="control" placeholder="Password" id="pass"
+                    autocomplete="current-password" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <input type="button" class="btn" id="btnEnter" value="Enter" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card" id="editor-card">
+    <div class="menu">
+        <span id="btnOpen" class="btn-round">Open</span>
+        <span id="filenameField" class="header">Vault</span>
+        <span id="btnSave" class="btn-round">Save</span>
+    </div>
+    <textarea class="control-editor" id="editor"></textarea>
+</div>
+
+<script type="text/javascript">
+    const KeyL = 32;
+
+    const fileField = d('#filename');
+    const filenameField = d('#filenameField');
+    const passField = d('#pass');
+    const btn = d('#btnEnter');
+    const btnOpen = d('#btnOpen');
+    const btnSave = d('#btnSave');
+    const modal = d('#modal');
+    const editor = d('#editor');
+
+    let isModalOpen = true;
+    let filename;
+    let hash;
+    let salt;
+
+    modal.style.display = 'flex';
+
+    btn.addEventListener('click', function (e) {
+        stopEvent(e);
+        tryCheck();
+    });
+
+    btnOpen.addEventListener('click', function (e) {
+        stopEvent(e);
+        clearFields();
+        showModal();
+    });
+
+    btnSave.addEventListener('click', function (e) {
+        stopEvent(e);
+        saveFile();
+    });
+
+    fileField.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            stopEvent(e);
+            passField.focus();
+        }
+    })
+
+    passField.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            stopEvent(e);
+            tryCheck();
+        }
+    });
+
+    modal.addEventListener('click', function (e) {
+        if (!isModalOpen) return;
+        if (e.target.closest('.card') !== null) return;
+
+        stopEvent(e);
+        hideModal();
+    });
+
+    document.addEventListener('keyup', function (e) {
+        if (!isModalOpen) return;
+        if (e.key === 'Escape') {
+            stopEvent(e);
+            hideModal();
+        }
+    });
+
+    async function tryCheck() {
+        let name = fileField.value.trim();
+        let pass = passField.value.trim();
+
+        if (checkFields([fileField, passField])) {
+            alert('Fields cannot be empty');
+            return;
+        }
+
+        setLoading(true);
+        fetch(`/api/v1/check/${encodeURIComponent(name)}`).then(data => data.json()).then(async function (data) {
+            console.log(data);
+            filename = name;
+            salt = data.salt;
+            hash = await argon2.hash({
+                pass: pass,
+                salt: salt,
+                time: 3,
+                mem: 19 * 1024,
+                hashLen: KeyL,
+                parallelism: 1,
+                type: argon2.ArgonType.Argon2id,
+            })
+            hash = hash.hashHex;
+
+            if (!data.success) {
+                filenameField.innerText = `${filename}*`;
+                hideModal();
+                clearFields();
+                editor.value = "";
+            }
+
+            if (data.success) openFile();
+        }).catch(err => {
+            console.log(err);
+            alert(err.message);
+        }).finally(() => setLoading(false));
+    }
+
+    function openFile() {
+        let obj = {
+            filename: filename,
+            hash: hash,
+        };
+
+        console.log(obj);
+        setLoading(true);
+        fetch('/api/v1/open', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(obj)
+        }).then(data => data.json()).then(function (data) {
+            console.log(data);
+            alert(data.message);
+
+            if (data.success) {
+                editor.value = data.data;
+                clearFields();
+                hideModal();
+            }
+        }).catch(err => {
+            console.log(err);
+            passField.focus();
+            alert(err);
+        }).finally(() => setLoading(false));
+    }
+
+    function saveFile() {
+        let text = editor.value.trim();
+
+        if (text === "") {
+            alert("Text cannot be empty");
+            return;
+        }
+
+        let obj = {
+            filename: filename,
+            hash: hash,
+            salt: salt,
+            text: text,
+        };
+
+        console.log(obj);
+        setLoading(true);
+        fetch('/api/v1/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(obj),
+        }).then(data => data.json()).then(function (data) {
+            console.log(data);
+            alert(data.message);
+            if (data.success) filenameField.innerText = filenameField.innerText.replace("*", "");
+        }).catch(err => {
+            console.log(err);
+            alert(err);
+        }).finally(() => setLoading(false));
+    }
+
+    /**
+     * @param {Event} e
+     */
+    function stopEvent(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function clearFields() {
+        fileField.value = "";
+        passField.value = "";
+        //filenameField.innerText = "Vault";
+    }
+
+    /**
+     * @param {boolean} loading
+     */
+    function setLoading(loading) {
+        fileField.disabled = loading;
+        passField.disabled = loading;
+        btn.disabled = loading;
+    }
+
+    function showModal() {
+        if (isModalOpen) return;
+        modal.style.opacity = '0';
+        modal.style.display = 'flex';
+        setTimeout(function () {
+            modal.style.opacity = '1';
+            isModalOpen = true;
+        }, 150);
+    }
+
+    function hideModal() {
+        if (!isModalOpen) return;
+        setTimeout(function () {
+            modal.style.opacity = '0';
+            setTimeout(function () {
+                modal.style.display = 'none';
+                isModalOpen = false;
+            }, 100);
+        }, 100);
+    }
+</script>
