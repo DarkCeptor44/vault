@@ -5,6 +5,9 @@
 
 Vault is a self-hosted project that allows you to store sensitive text in a secure way. It uses [Argon2](https://en.wikipedia.org/wiki/Argon2) for password hashing and key derivation and encrypts the data symmetrically with AES-256, the user's password is not saved at all, only the encrypted data with the generated salt. I wouldn't recommend using it in a real production environment but it's useful for keeping your secrets (or diary) safe from the general public.
 
+![screen1](images/screen1.png)
+![screen2](images/screen2.png)
+
 ## Getting Started
 
 ### Manually
