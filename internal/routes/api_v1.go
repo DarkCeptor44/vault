@@ -11,7 +11,8 @@ import (
 )
 
 func routeApiV1(api fiber.Router) {
-	api.Get("/check/:filename", func(c *fiber.Ctx) error {
+	v1 := api.Group("/v1")
+	v1.Get("/check/:filename", func(c *fiber.Ctx) error {
 		filename := util.ClearFilename(c.Params("filename"))
 
 		dir, err := os.ReadDir(util.DocFolder)
@@ -50,7 +51,7 @@ func routeApiV1(api fiber.Router) {
 		return notFound(c)
 	})
 
-	api.Post("/open", func(c *fiber.Ctx) error {
+	v1.Post("/open", func(c *fiber.Ctx) error {
 		var d struct {
 			Filename string
 			Hash     string
@@ -75,7 +76,7 @@ func routeApiV1(api fiber.Router) {
 		})
 	})
 
-	api.Post("/save", func(c *fiber.Ctx) error {
+	v1.Post("/save", func(c *fiber.Ctx) error {
 		var data data
 		err := c.BodyParser(&data)
 		if err != nil {
