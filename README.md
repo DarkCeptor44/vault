@@ -31,21 +31,27 @@ task
 
 ### Docker
 
-There aren't any Docker images for this project yet so you'll have to build it yourself:
+You can find a Docker image [here](https://hub.docker.com/r/darkceptor44/vault):
 
 ```bash
-docker build -t vault:latest . --no-cache
-docker run -d --name vault -p 8080:8080 -v ./data:/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped vault:latest
+docker run -d --name vault -p 8080:8080 -v ./data:/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped darkceptor44/vault
+```
+
+Or build it yourself:
+
+```bash
+docker build -t vault . --no-cache
+docker run -d --name vault -p 8080:8080 -v ./data:/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped vault
 ```
 
 ### Docker Compose
 
-You can find a `docker-compose.yml` file [here](docker-compose.yml) (you will have to build your own image too, check the section above):
+You can find a `compose.yml` file [here](compose.yml):
 
 ```yaml
 services:
   vault:
-    image: vault:latest
+    image: darkceptor44/vault:latest
     container_name: vault
     ports:
       - 8080:8080
@@ -74,8 +80,8 @@ If needed you can make a `.env` file in the root of the repo and put some env va
 ## Disclaimer
 
 - This project was made for personal use and learning purposes, there could be vulnerabilities.
-- Since the user's password is not saved it is up to the user to choose a secure password.
-- This project was made mostly in a private self-hosted Git instance and that's why there are few commits.
+- Since the user's password is not saved it is up to the user to choose a secure password and if anything happens (say it refuses to decrypt) the data is lost.
+- This project was made mostly in a private self-hosted Git instance and that's why there are only a few commits.
 
 ## License
 

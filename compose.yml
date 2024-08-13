@@ -1,6 +1,6 @@
 services:
   vault:
-    image: vault:latest
+    image: darkceptor44/vault:latest
     container_name: vault
     ports:
       - 8080:8080
