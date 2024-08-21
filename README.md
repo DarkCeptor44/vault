@@ -34,14 +34,14 @@ task
 You can find a Docker image [here](https://hub.docker.com/r/darkceptor44/vault):
 
 ```bash
-docker run -d --name vault -p 8080:8080 -v ./data:/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped darkceptor44/vault
+docker run -d --name vault -p 8080:8080 -v ./data:/app/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped darkceptor44/vault
 ```
 
 Or build it yourself:
 
 ```bash
 docker build -t vault . --no-cache
-docker run -d --name vault -p 8080:8080 -v ./data:/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped vault
+docker run -d --name vault -p 8080:8080 -v ./data:/app/documents -v /etc/localtime:/etc/localtime:ro --restart unless-stopped vault
 ```
 
 ### Docker Compose
@@ -61,7 +61,7 @@ services:
       - DOCKER=yes  # optional
       - DEBUG=yes  # if debug needed
     volumes:
-      - ./data:/documents # where data will be stored
+      - ./data:/app/documents # where data will be stored
       - /etc/localtime:/etc/localtime:ro # for correct timezone when logging
     restart: unless-stopped
 ```

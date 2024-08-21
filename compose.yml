@@ -10,6 +10,6 @@ services:
       - DOCKER=yes  # optional
       - DEBUG=yes  # if debug needed
     volumes:
-      - ./data:/documents # where data will be stored
+      - ./data:/app/documents # where data will be stored
       - /etc/localtime:/etc/localtime:ro # for correct timezone when logging
     restart: unless-stopped
