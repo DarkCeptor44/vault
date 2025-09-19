@@ -1,5 +1,11 @@
 # Vault
 
+**Project Archived: No Longer Maintained**
+
+This project has been archived and is no longer actively maintained. I originally built this as a learning exercise back when I was learning Go but there are big architectural issues with how hashing and encryption are used (and I started learning Rust instead).
+
+You're welcome to explore the code and maybe even self-host it but it's very basic, I'd recomment not using it for anything other than a digital diary.
+
 [![made](https://forthebadge.com/images/badges/made-with-go.svg)](https://forthebadge.com)
 [![powered](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
 
